@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useCalendar } from '../../hooks/useCalendar';
+import type { CalendarEvent } from '../../types/calendar.types';
 import { formatTime } from '../../utils/date.utils';
 import { calculateEventPosition } from '../../utils/event.utils';
 import TimeSlot from './TimeSlot';
@@ -7,6 +8,7 @@ import EventBlock from './EventBlock';
 
 interface TimeGridProps {
   onSlotClick: (date: Date, hour: number) => void;
+  onEventClick: (event: CalendarEvent) => void;
 }
 
 const GridWrapper = styled.div`
@@ -36,7 +38,7 @@ const TimeLabel = styled.div`
 const GRID_START_HOUR = 8;
 const GRID_END_HOUR = 18;
 
-function TimeGrid({ onSlotClick }: TimeGridProps): JSX.Element {
+function TimeGrid({ onSlotClick, onEventClick }: TimeGridProps): JSX.Element {
   const { currentWeek, getEventsForWeek } = useCalendar();
 
   // Generate hours from 8 AM to 6 PM
@@ -75,6 +77,7 @@ function TimeGrid({ onSlotClick }: TimeGridProps): JSX.Element {
             top={position.top}
             height={position.height}
             column={position.column}
+            onClick={onEventClick}
           />
         );
       })}

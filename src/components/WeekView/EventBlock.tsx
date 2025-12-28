@@ -7,6 +7,7 @@ interface EventBlockProps {
   top: number;
   height: number;
   column: number;
+  onClick: (event: CalendarEvent) => void;
 }
 
 interface BlockContainerProps {
@@ -80,8 +81,13 @@ function darkenColor(hex: string, percent: number): string {
   return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
 }
 
-function EventBlock({ event, top, height, column }: EventBlockProps): JSX.Element {
+function EventBlock({ event, top, height, column, onClick }: EventBlockProps): JSX.Element {
   const timeString = formatEventTime(event);
+
+  const handleClick = (e: React.MouseEvent): void => {
+    e.stopPropagation();
+    onClick(event);
+  };
 
   return (
     <BlockContainer
@@ -89,6 +95,7 @@ function EventBlock({ event, top, height, column }: EventBlockProps): JSX.Elemen
       $height={height}
       $column={column}
       $color={event.color}
+      onClick={handleClick}
     >
       <EventTitle>{event.title}</EventTitle>
       {height > 30 && <EventTime>{timeString}</EventTime>}

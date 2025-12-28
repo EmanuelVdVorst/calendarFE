@@ -1,12 +1,14 @@
 import styled from 'styled-components';
-import type { TimeSlot, EventFormData } from '../../types/calendar.types';
+import type { TimeSlot, EventFormData, CalendarEvent } from '../../types/calendar.types';
 import EventForm from './EventForm';
 
 interface EventModalProps {
   isOpen: boolean;
   selectedSlot: TimeSlot | null;
+  editingEvent: CalendarEvent | null;
   onClose: () => void;
   onSubmit: (formData: EventFormData) => void;
+  onDelete?: (eventId: string) => void;
 }
 
 const Overlay = styled.div`
@@ -39,8 +41,8 @@ const ModalHeader = styled.h2`
   margin: 0 0 20px 0;
 `;
 
-function EventModal({ isOpen, selectedSlot, onClose, onSubmit }: EventModalProps): JSX.Element | null {
-  if (!isOpen || !selectedSlot) {
+function EventModal({ isOpen, selectedSlot, editingEvent, onClose, onSubmit, onDelete }: EventModalProps): JSX.Element | null {
+  if (!isOpen || (!selectedSlot && !editingEvent)) {
     return null;
   }
 
@@ -52,15 +54,19 @@ function EventModal({ isOpen, selectedSlot, onClose, onSubmit }: EventModalProps
     e.stopPropagation();
   };
 
+  const isEditMode = editingEvent !== null;
+
   return (
     <Overlay onClick={handleOverlayClick}>
       <ModalContainer onClick={handleModalClick}>
-        <ModalHeader>New Event</ModalHeader>
+        <ModalHeader>{isEditMode ? 'Edit Event' : 'New Event'}</ModalHeader>
         <EventForm
-          initialDate={selectedSlot.date}
-          initialHour={selectedSlot.hour}
+          initialDate={selectedSlot?.date ?? editingEvent!.start}
+          initialHour={selectedSlot?.hour ?? editingEvent!.start.getHours()}
+          editingEvent={editingEvent}
           onSubmit={onSubmit}
           onCancel={onClose}
+          onDelete={onDelete}
         />
       </ModalContainer>
     </Overlay>

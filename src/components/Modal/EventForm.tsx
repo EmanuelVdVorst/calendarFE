@@ -1,13 +1,15 @@
 import { useState, type FormEvent } from 'react';
 import styled from 'styled-components';
-import type { EventFormData } from '../../types/calendar.types';
+import type { EventFormData, CalendarEvent } from '../../types/calendar.types';
 import { validateEventTimes } from '../../utils/event.utils';
 
 interface EventFormProps {
   initialDate: Date;
   initialHour: number;
+  editingEvent: CalendarEvent | null;
   onSubmit: (formData: EventFormData) => void;
   onCancel: () => void;
+  onDelete?: (eventId: string) => void;
 }
 
 const FormContainer = styled.form`
@@ -93,11 +95,24 @@ const SubmitButton = styled(Button)`
   }
 `;
 
-function EventForm({ initialDate, initialHour, onSubmit, onCancel }: EventFormProps): JSX.Element {
-  const defaultStartTime = `${initialHour.toString().padStart(2, '0')}:00`;
-  const defaultEndTime = `${(initialHour + 1).toString().padStart(2, '0')}:00`;
+const DeleteButton = styled(Button)`
+  background-color: #FF3B30;
+  color: #FFFFFF;
 
-  const [title, setTitle] = useState('');
+  &:hover {
+    background-color: #D60000;
+  }
+`;
+
+function EventForm({ initialDate, initialHour, editingEvent, onSubmit, onCancel, onDelete }: EventFormProps): JSX.Element {
+  const defaultStartTime = editingEvent
+    ? `${editingEvent.start.getHours().toString().padStart(2, '0')}:${editingEvent.start.getMinutes().toString().padStart(2, '0')}`
+    : `${initialHour.toString().padStart(2, '0')}:00`;
+  const defaultEndTime = editingEvent
+    ? `${editingEvent.end.getHours().toString().padStart(2, '0')}:${editingEvent.end.getMinutes().toString().padStart(2, '0')}`
+    : `${(initialHour + 1).toString().padStart(2, '0')}:00`;
+
+  const [title, setTitle] = useState(editingEvent?.title ?? '');
   const [startTime, setStartTime] = useState(defaultStartTime);
   const [endTime, setEndTime] = useState(defaultEndTime);
   const [error, setError] = useState<string | null>(null);
@@ -125,6 +140,14 @@ function EventForm({ initialDate, initialHour, onSubmit, onCancel }: EventFormPr
       endTime,
       date: initialDate,
     });
+  };
+
+  const handleDelete = (): void => {
+    if (editingEvent && onDelete) {
+      if (window.confirm(`Are you sure you want to delete "${editingEvent.title}"?`)) {
+        onDelete(editingEvent.id);
+      }
+    }
   };
 
   return (
@@ -166,11 +189,16 @@ function EventForm({ initialDate, initialHour, onSubmit, onCancel }: EventFormPr
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
       <ButtonGroup>
+        {editingEvent && onDelete && (
+          <DeleteButton type="button" onClick={handleDelete}>
+            Delete
+          </DeleteButton>
+        )}
         <CancelButton type="button" onClick={onCancel}>
           Cancel
         </CancelButton>
         <SubmitButton type="submit">
-          Create Event
+          {editingEvent ? 'Save Changes' : 'Create Event'}
         </SubmitButton>
       </ButtonGroup>
     </FormContainer>
