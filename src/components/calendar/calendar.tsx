@@ -1,36 +1,37 @@
 import styled from 'styled-components';
 import { useCalendar } from '../../hooks/useCalendar';
 import { getMonthName, isToday, isDateInWeek } from '../../utils/date.utils';
+import { margins, colors, borderRadius, fonts, paddings } from '../basics/Styles';
 
-const MiniCalendarContainer = styled.div`
-  margin-bottom: 24px;
-  background-color: #FFFFFF;
-  border-radius: 8px;
-  padding: 12px;
-`;
+const MiniCalendarContainer = styled.div({
+  marginBottom: paddings.medium,
+  backgroundColor: colors.white,
+  borderRadius: borderRadius.medium,
+  padding: margins.medium,
+});
 
-const MonthHeader = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  color: #000;
-  margin-bottom: 12px;
-  text-align: center;
-`;
+const MonthHeader = styled.div({
+  fontSize: fonts.size.medium,
+  fontWeight: fonts.weight.medium,
+  color: colors.black,
+  marginBottom: margins.medium,
+  textAlign: 'center',
+});
 
-const DaysGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-`;
+const DaysGrid = styled.div({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(7, 1fr)',
+  gap: margins.xxsmall,
+});
 
-const DayLabel = styled.div`
-  font-size: 10px;
-  font-weight: 600;
-  color: #666;
-  text-align: center;
-  padding: 4px 0;
-  text-transform: uppercase;
-`;
+const DayLabel = styled.div({
+  fontSize: fonts.size.small,
+  fontWeight: fonts.weight.medium,
+  color: colors.gray,
+  textAlign: 'center',
+  padding: `${margins.xxsmall} 0`,
+  textTransform: 'uppercase',
+});
 
 interface DayCellProps {
   $isToday: boolean;
@@ -38,28 +39,32 @@ interface DayCellProps {
   $isCurrentMonth: boolean;
 }
 
-const DayCell = styled.div<DayCellProps>`
-  font-size: 12px;
-  text-align: center;
-  padding: 6px 0;
-  border-radius: 4px;
-  cursor: pointer;
-  color: ${props => props.$isCurrentMonth ? '#000' : '#CCC'};
-  background-color: ${props => {
+const DayCell = styled.div<DayCellProps>((props) => {
+  const getBackgroundColor = (): string => {
     if (props.$isToday) {
-return '#007AFF';
-}
+      return colors.primairy;
+    }
     if (props.$isInCurrentWeek) {
-return '#E3F2FD';
-}
+      return colors.secondaryHover;
+    }
     return 'transparent';
-  }};
-  font-weight: ${props => props.$isToday ? '600' : 'normal'};
+  };
 
-  &:hover {
-    background-color: ${props => props.$isToday ? '#0051D5' : '#F0F0F0'};
-  }
-`;
+  return {
+    fontSize: fonts.size.small,
+    textAlign: 'center',
+    padding: `${margins.xxsmall} 0`,
+    borderRadius: margins.xxsmall,
+    cursor: 'pointer',
+    color: props.$isCurrentMonth ? colors.black : colors.lightGray,
+    backgroundColor: getBackgroundColor(),
+    fontWeight: props.$isToday ? fonts.weight.medium : fonts.weight.small,
+
+    '&:hover': {
+      backgroundColor: props.$isToday ? colors.primairyHover : colors.secondaryHover,
+    },
+  };
+});
 
 function MiniCalendar(): JSX.Element {
   const { currentWeek } = useCalendar();
@@ -118,4 +123,4 @@ function MiniCalendar(): JSX.Element {
   );
 }
 
-export default MiniCalendar;
+export { MiniCalendar };

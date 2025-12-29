@@ -16,7 +16,10 @@ This is the frontend for a Calendar application built with React, TypeScript, an
 
 **Styling:**
 - Always use styled-components for component styling
-- Avoid inline styles and traditional CSS when possible
+- All styles must be in separate `.style.ts` files
+- Never use inline styles or traditional CSS files
+- Create base styled components and extend them for variations
+- Export layout components (ButtonGroup, containers) from style files
 
 **Code Organization:**
 - Create separate files for each component/utility
@@ -24,6 +27,98 @@ This is the frontend for a Calendar application built with React, TypeScript, an
 - Build reusable components
 - Keep files under 300 lines
 - Keep functions under 100 lines with max complexity of 10
+
+## Component Architecture
+
+**CRITICAL: Build a Component Library, Not Just Styled Components**
+
+When creating UI elements, follow this established pattern to build a reusable component library:
+
+### Component Structure
+Each component should have its own directory with:
+- `ComponentName.tsx` - The component implementation
+- `ComponentName.type.ts` - All TypeScript interfaces and types
+- `ComponentName.style.ts` - All styled-components definitions
+- `index.ts` - Public exports
+
+**Example:**
+```
+src/components/basics/buttons/
+├── Buttons.tsx           # CancelButton, DeleteButton, SubmitButton components
+├── Button.props.type.ts  # OnlyClickButtonProps, LabeledSubmitButtonProps
+├── Button.style.ts       # StyledCancelButton, StyledDeleteButton, etc.
+└── index.ts              # export * from './Buttons'
+```
+
+### Component Abstraction Levels
+
+**1. Primitive Components (Lowest Level)**
+Small, focused, single-purpose components that serve as building blocks:
+- `Input` - Basic input wrapper with onChange handler
+- `Label` - Simple label component
+- `ErrorMessage` - Error display component
+- `CancelButton`, `DeleteButton`, `SubmitButton` - Specific button types
+
+**2. Compound Components (Middle Level)**
+Combine primitives to create more complex, reusable patterns:
+- `TextField` - Combines Label + Input + ErrorMessage
+- `TimeField` - TextField with type="time"
+- `StartToEndInputField` - Two TimeFields side by side
+- `Form` - Form wrapper with submit handling
+
+**3. Feature Components (Highest Level)**
+Domain-specific components that use compound components:
+- `EventForm` - Uses TextField, TimeField, ButtonGroup
+- `EventModal` - Uses Form and other compounds for specific feature
+
+### Design Principles
+
+**Create Abstractions, Not Just Wrappers:**
+❌ BAD - Just wrapping styled-components everywhere:
+```typescript
+// Don't do this in feature code
+<StyledInput value={title} onChange={e => setTitle(e.target.value)} />
+<StyledLabel>Title</StyledLabel>
+```
+
+✅ GOOD - Create reusable component abstractions:
+```typescript
+// Create the abstraction once in src/components/basics/
+function TextField({ label, value, onChange, error }: InputFieldProps) {
+  return (
+    <StyledFormGroup>
+      <Label id={id} label={label} />
+      <Input value={value} onChange={onChange} />
+      {error && <ErrorMessage label={error} />}
+    </StyledFormGroup>
+  );
+}
+
+// Use clean components in feature code
+<TextField label="Title" value={title} onChange={setTitle} error={errors.title} />
+```
+
+**Component Responsibilities:**
+- **Styled components** (`.style.ts`): Only styling, no logic
+- **Component abstractions** (`.tsx`): Handle props, compose smaller components, contain behavior
+- **Types** (`.type.ts`): Define clean, specific prop interfaces
+- **Exports** (`index.ts`): Control public API
+
+**Build for Reusability:**
+- Create small, composable components that can be used across the application
+- Each component should do one thing well
+- Prefer composition over configuration
+- Think "component library" not "one-off implementations"
+
+**Examples from Codebase:**
+- See `src/components/basics/buttons/` for button component patterns
+- See `src/components/basics/Form/` for form field composition
+- See `src/components/basics/Modal/` for modal pattern
+
+### Location of Components
+- **Reusable UI components**: `src/components/basics/`
+- **Feature-specific components**: `src/components/[FeatureName]/`
+- **Layout components**: Export from `.style.ts` files (e.g., `ButtonGroup`, `StyledFormGroup`)
 
 ## Development Commands
 
@@ -94,10 +189,20 @@ The project uses Husky to enforce code quality before commits and pushes:
 
 ### Application Structure
 - **Entry point**: `index.html` loads `src/main.tsx`
-- **Root component**: `src/App.tsx` - Currently a minimal template with counter demo
-- **Styling**: Component-level CSS (`App.css`) and global styles (`index.css`)
+- **Root component**: `src/App.tsx` - Calendar application with week view
+- **Component library**: `src/components/basics/` - Reusable UI components (buttons, forms, modals)
+- **Feature components**: `src/components/` - Feature-specific components (EventForm, Calendar views)
+- **Styling**: All styling via styled-components in `.style.ts` files
 
-The application is currently in initial setup phase with placeholder content. As it grows, consider organizing components, hooks, and utilities into dedicated directories within `src/`.
+**Component Organization:**
+```
+src/components/
+├── basics/              # Reusable component library
+│   ├── buttons/        # Button components (Cancel, Delete, Submit)
+│   ├── Form/           # Form components and input fields
+│   └── Modal/          # Modal components
+└── [Features]/         # Feature-specific components (EventForm, etc.)
+```
 
 ### Backend Integration
 The backend API runs on `http://localhost:5000` (see `../backend/CLAUDE.md`). When implementing API calls, ensure CORS is properly handled (already configured on backend).

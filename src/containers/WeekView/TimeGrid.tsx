@@ -11,29 +11,29 @@ interface TimeGridProps {
   onEventClick: (event: CalendarEvent) => void;
 }
 
-const GridWrapper = styled.div`
-  position: relative;
-`;
+const GridWrapper = styled.div({
+  position: 'relative',
+});
 
-const GridContainer = styled.div`
-  display: grid;
-  grid-template-columns: 60px repeat(7, 1fr);
-  position: relative;
-  background-color: #FFFFFF;
-`;
+const GridContainer = styled.div({
+  display: 'grid',
+  gridTemplateColumns: '60px repeat(7, 1fr)',
+  position: 'relative',
+  backgroundColor: '#FFFFFF',
+});
 
-const TimeLabel = styled.div`
-  height: 60px;
-  padding: 8px;
-  font-size: 12px;
-  color: #666;
-  border-right: 1px solid #E0E0E0;
-  border-bottom: 1px solid #F0F0F0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  background-color: #FAFAFA;
-`;
+const TimeLabel = styled.div({
+  height: '60px',
+  padding: '8px',
+  fontSize: '12px',
+  color: '#666',
+  borderRight: '1px solid #E0E0E0',
+  borderBottom: '1px solid #F0F0F0',
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'flex-end',
+  backgroundColor: '#FAFAFA',
+});
 
 const GRID_START_HOUR = 8;
 const GRID_END_HOUR = 18;

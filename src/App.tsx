@@ -1,5 +1,5 @@
 import { CalendarProvider } from './context/CalendarContext';
-import Calendar from './components/Calendar/Calendar';
+import Calendar from './pages/Calendar/Calendar';
 
 function App(): JSX.Element {
   return (

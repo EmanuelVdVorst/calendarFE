@@ -1,6 +1,6 @@
-import Sidebar from '../Sidebar/Sidebar';
-import WeekNavigation from '../Navigation/WeekNavigation';
-import WeekView from '../WeekView/WeekView';
+import Sidebar from '../../containers/Sidebar/Sidebar';
+import WeekNavigation from '../../components/Navigation/WeekNavigation';
+import WeekView from '../../containers/WeekView/WeekView';
 import { CalendarContainer, MainContent } from './Calendar.styles';
 
 function Calendar(): JSX.Element {

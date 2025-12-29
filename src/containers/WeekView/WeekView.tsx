@@ -2,16 +2,16 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import WeekHeader from './WeekHeader';
 import TimeGrid from './TimeGrid';
-import EventModal from '../Modal/EventModal';
+import EventModal from '../../components/EventModal/EventModal';
 import { useCalendar } from '../../hooks/useCalendar';
 import { createEventFromFormData, getRandomEventColor } from '../../utils/event.utils';
 import type { TimeSlot as TimeSlotType, EventFormData, CalendarEvent } from '../../types/calendar.types';
 
-const WeekViewContainer = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  background-color: #FFFFFF;
-`;
+const WeekViewContainer = styled.div({
+  flex: 1,
+  overflowY: 'auto',
+  backgroundColor: '#FFFFFF',
+});
 
 function WeekView(): JSX.Element {
   const { addEvent, updateEvent, deleteEvent } = useCalendar();

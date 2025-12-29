@@ -17,47 +17,47 @@ interface BlockContainerProps {
   $color: string;
 }
 
-const BlockContainer = styled.div<BlockContainerProps>`
-  position: absolute;
-  top: ${props => props.$top}px;
-  height: ${props => Math.max(props.$height, 20)}px;
-  left: calc((100% - 60px) / 7 * ${props => props.$column} + 60px + 2px);
-  width: calc((100% - 60px) / 7 - 4px);
-  background-color: ${props => props.$color};
-  border-left: 3px solid ${props => darkenColor(props.$color, 20)};
-  border-radius: 4px;
-  padding: 4px 8px;
-  overflow: hidden;
-  cursor: pointer;
-  z-index: 10;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+const BlockContainer = styled.div<BlockContainerProps>((props) => ({
+  position: 'absolute',
+  top: `${props.$top}px`,
+  height: `${Math.max(props.$height, 20)}px`,
+  left: `calc((100% - 60px) / 7 * ${props.$column} + 60px + 2px)`,
+  width: 'calc((100% - 60px) / 7 - 4px)',
+  backgroundColor: props.$color,
+  borderLeft: `3px solid ${darkenColor(props.$color, 20)}`,
+  borderRadius: '4px',
+  padding: '4px 8px',
+  overflow: 'hidden',
+  cursor: 'pointer',
+  zIndex: 10,
+  transition: 'transform 0.1s ease, box-shadow 0.1s ease',
 
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    z-index: 20;
-  }
-`;
+  '&:hover': {
+    transform: 'translateY(-1px)',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+    zIndex: 20,
+  },
+}));
 
-const EventTitle = styled.div`
-  font-size: 12px;
-  font-weight: 600;
-  color: #FFFFFF;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 2px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-`;
+const EventTitle = styled.div({
+  fontSize: '12px',
+  fontWeight: 600,
+  color: '#FFFFFF',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  marginBottom: '2px',
+  textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+});
 
-const EventTime = styled.div`
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.9);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-`;
+const EventTime = styled.div({
+  fontSize: '10px',
+  color: 'rgba(255, 255, 255, 0.9)',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+});
 
 function darkenColor(hex: string, percent: number): string {
   // Remove the # if present
