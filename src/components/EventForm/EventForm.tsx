@@ -2,8 +2,8 @@ import { useState } from 'react';
 import type { EventFormData, CalendarEvent } from '../../types/calendar.types';
 import { validateEventTimes } from '../../utils/event.utils';
 // Import smart components with built-in logic
-import { Form, TextField, StartToEndInputField, ButtonGroup } from '../basics';
-import { CancelButton, SubmitButton, DeleteButton } from '../basics/buttons';
+import { Form, TextField, StartToEndInputField } from '../basics';
+import { HorizontalButtonGroup, StyledPrimairyButton, StyledSecondaryButton, StyledDeletionButton } from '../basics/Styles';
 import { ErrorMessage } from '../basics/Form/components';
 
 // ==================== EVENT-SPECIFIC PROPS ====================
@@ -96,11 +96,11 @@ function EventForm({ initialDate, initialHour, editingEvent, onSubmit, onCancel,
       {/* Show validation errors */}
       {error && <ErrorMessage label={error} />}
 
-      <ButtonGroup>
-        {editingEvent && onDelete && (<DeleteButton onClick={handleDelete} />)}
-        <CancelButton onClick={onCancel} />
-        <SubmitButton label={editingEvent ? 'Save Changes' : 'Create Event'} />
-      </ButtonGroup>
+      <HorizontalButtonGroup>
+        {editingEvent && onDelete && (<StyledDeletionButton onClick={handleDelete}>Delete</StyledDeletionButton>)}
+        <StyledSecondaryButton onClick={onCancel}>Cancel</StyledSecondaryButton>
+        <StyledPrimairyButton type="submit">{editingEvent ? 'Save Changes' : 'Create Event'}</StyledPrimairyButton>
+      </HorizontalButtonGroup>
     </Form>
   );
 }

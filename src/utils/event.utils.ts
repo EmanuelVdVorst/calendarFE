@@ -1,5 +1,6 @@
 import type { CalendarEvent, EventFormData, EventPosition, WeekInfo } from '../types/calendar.types';
 import { isSameDay, isDateInWeek } from './date.utils';
+import { weekGrid } from '../components/basics/Styles';
 
 export function generateEventId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -42,10 +43,9 @@ export function calculateEventPosition(
   const startMinutes = eventStart.getMinutes();
   const startTimeInHours = startHour + (startMinutes / 60);
 
-  // Assuming grid starts at 8 AM, each hour is 60px
-  const gridStartHour = 8;
-  const hourHeight = 60; // pixels
-  const top = (startTimeInHours - gridStartHour) * hourHeight;
+  // Use grid configuration from constants
+  const hourHeight = parseInt(weekGrid.slotHeight);
+  const top = (startTimeInHours - weekGrid.startHour) * hourHeight;
 
   // Calculate height (duration in hours)
   const durationMs = eventEnd.getTime() - eventStart.getTime();

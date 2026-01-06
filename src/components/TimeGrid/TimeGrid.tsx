@@ -1,50 +1,20 @@
-import styled from 'styled-components';
+import type { ReactElement } from 'react';
 import { useCalendar } from '../../hooks/useCalendar';
-import type { CalendarEvent } from '../../types/calendar.types';
 import { formatTime } from '../../utils/date.utils';
 import { calculateEventPosition } from '../../utils/event.utils';
-import TimeSlot from './TimeSlot';
-import EventBlock from './EventBlock';
+import { weekGrid } from '../basics/Styles';
+import { TimeSlot } from '../basics/Calendar';
+import { EventBlock } from '../EventBlock';
+import { GridWrapper, GridContainer, TimeLabel, HourRow } from './TimeGrid.style';
+import type { TimeGridProps } from './TimeGrid.type';
 
-interface TimeGridProps {
-  onSlotClick: (date: Date, hour: number) => void;
-  onEventClick: (event: CalendarEvent) => void;
-}
-
-const GridWrapper = styled.div({
-  position: 'relative',
-});
-
-const GridContainer = styled.div({
-  display: 'grid',
-  gridTemplateColumns: '60px repeat(7, 1fr)',
-  position: 'relative',
-  backgroundColor: '#FFFFFF',
-});
-
-const TimeLabel = styled.div({
-  height: '60px',
-  padding: '8px',
-  fontSize: '12px',
-  color: '#666',
-  borderRight: '1px solid #E0E0E0',
-  borderBottom: '1px solid #F0F0F0',
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'flex-end',
-  backgroundColor: '#FAFAFA',
-});
-
-const GRID_START_HOUR = 8;
-const GRID_END_HOUR = 18;
-
-function TimeGrid({ onSlotClick, onEventClick }: TimeGridProps): JSX.Element {
+export function TimeGrid({ onSlotClick, onEventClick }: TimeGridProps): ReactElement {
   const { currentWeek, getEventsForWeek } = useCalendar();
 
-  // Generate hours from 8 AM to 6 PM
+  // Generate hours from grid configuration
   const hours = Array.from(
-    { length: GRID_END_HOUR - GRID_START_HOUR },
-    (_, i) => GRID_START_HOUR + i
+    { length: weekGrid.endHour - weekGrid.startHour },
+    (_, i) => weekGrid.startHour + i
   );
 
   // Get events for current week
@@ -54,7 +24,7 @@ function TimeGrid({ onSlotClick, onEventClick }: TimeGridProps): JSX.Element {
     <GridWrapper>
       <GridContainer>
         {hours.map(hour => (
-          <div key={`hour-${hour}`} style={{ display: 'contents' }}>
+          <HourRow key={`hour-${hour}`}>
             <TimeLabel>{formatTime(hour)}</TimeLabel>
             {currentWeek.days.map((day) => (
               <TimeSlot
@@ -64,7 +34,7 @@ function TimeGrid({ onSlotClick, onEventClick }: TimeGridProps): JSX.Element {
                 onClick={onSlotClick}
               />
             ))}
-          </div>
+          </HourRow>
         ))}
       </GridContainer>
       {/* Render events as positioned blocks */}
@@ -84,5 +54,3 @@ function TimeGrid({ onSlotClick, onEventClick }: TimeGridProps): JSX.Element {
     </GridWrapper>
   );
 }
-
-export default TimeGrid;
