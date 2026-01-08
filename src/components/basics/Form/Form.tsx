@@ -7,7 +7,7 @@ import type { FormProps } from './Form.type';
 function Form({ onSubmit, children, className }: FormProps): ReactElement{
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    onSubmit();
+    void onSubmit();
   };
 
   return (

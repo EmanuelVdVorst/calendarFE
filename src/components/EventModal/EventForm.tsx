@@ -11,9 +11,9 @@ interface EventFormProps {
   initialDate: Date;
   initialHour: number;
   editingEvent: CalendarEvent | null;
-  onSubmit: (formData: EventFormData) => void;
+  onSubmit: (formData: EventFormData) => void | Promise<void>;
   onCancel: () => void;
-  onDelete?: (eventId: string) => void;
+  onDelete?: (eventId: string) => void | Promise<void>;
 }
 
 
@@ -34,7 +34,7 @@ function EventForm({ initialDate, initialHour, editingEvent, onSubmit, onCancel,
   const [error, setError] = useState<string | null>(null);
 
   // Event-specific validation and submission logic
-  const handleSubmit = (): void => {
+  const handleSubmit = async (): Promise<void> => {
     setError(null);
 
     // Validate title
@@ -50,7 +50,7 @@ function EventForm({ initialDate, initialHour, editingEvent, onSubmit, onCancel,
       return;
     }
 
-    onSubmit({
+    await onSubmit({
       title: title.trim(),
       startTime,
       endTime,
@@ -58,10 +58,10 @@ function EventForm({ initialDate, initialHour, editingEvent, onSubmit, onCancel,
     });
   };
 
-  const handleDelete = (): void => {
+  const handleDelete = async (): Promise<void> => {
     if (editingEvent && onDelete) {
       if (window.confirm(`Are you sure you want to delete "${editingEvent.title}"?`)) {
-        onDelete(editingEvent.id);
+        await onDelete(editingEvent.id);
       }
     }
   };
@@ -97,9 +97,16 @@ function EventForm({ initialDate, initialHour, editingEvent, onSubmit, onCancel,
       {error && <ErrorMessage label={error} />}
 
       <HorizontalButtonGroup>
-        {editingEvent && onDelete && (<StyledDeletionButton onClick={handleDelete}>Remove</StyledDeletionButton>)}
-        <StyledSecondaryButton onClick={onCancel}> Cancel </StyledSecondaryButton>
-        <StyledPrimairyButton>{editingEvent ? 'Save Changes' : 'Create Event'} </StyledPrimairyButton>
+        {editingEvent && onDelete && (
+          <StyledDeletionButton
+            type="button"
+            onClick={() => { void handleDelete(); }}
+          >
+            Remove
+          </StyledDeletionButton>
+        )}
+        <StyledSecondaryButton type="button" onClick={onCancel}>Cancel</StyledSecondaryButton>
+        <StyledPrimairyButton type="submit">{editingEvent ? 'Save Changes' : 'Create Event'}</StyledPrimairyButton>
       </HorizontalButtonGroup>
     </Form>
   );

@@ -8,8 +8,8 @@ interface EventModalProps {
   selectedSlot: TimeSlot | null;
   editingEvent: CalendarEvent | null;
   onClose: () => void;
-  onSubmit: (formData: EventFormData) => void;
-  onDelete?: (eventId: string) => void;
+  onSubmit: (formData: EventFormData) => void | Promise<void>;
+  onDelete?: (eventId: string) => void | Promise<void>;
 }
 
 function EventModal({ isOpen, selectedSlot, editingEvent, onClose, onSubmit, onDelete }: EventModalProps): JSX.Element | null {

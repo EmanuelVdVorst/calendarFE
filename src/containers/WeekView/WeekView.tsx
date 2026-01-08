@@ -15,10 +15,12 @@ const WeekViewContainer = styled.div({
 });
 
 export function WeekView(): ReactElement {
-  const { addEvent, updateEvent, deleteEvent } = useCalendar();
+  const context = useCalendar();
+
   const [selectedSlot, setSelectedSlot] = useState<TimeSlotType | null>(null);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   const handleSlotClick = (date: Date, hour: number): void => {
     setSelectedSlot({ date, hour });
@@ -38,29 +40,55 @@ export function WeekView(): ReactElement {
     setEditingEvent(null);
   };
 
-  const handleSubmitEvent = (formData: EventFormData): void => {
-    if (editingEvent) {
-      // Update existing event
-      const updatedEvent = createEventFromFormData(formData, editingEvent.color);
-      updateEvent(editingEvent.id, updatedEvent);
-    } else {
-      // Create new event
-      const color = getRandomEventColor();
-      const newEvent = createEventFromFormData(formData, color);
-      addEvent(newEvent);
+
+  const submitEvent = async (formData: EventFormData): Promise<void> => {
+    try {
+      if (editingEvent) {
+        // Update existing event
+        const updatedEvent = createEventFromFormData(
+          formData,
+          editingEvent.color
+        );
+        await context.updateEvent(editingEvent.id, updatedEvent);
+      } else {
+        // Create new event
+        const color = getRandomEventColor();
+        const newEvent = createEventFromFormData(formData, color);
+        await context.addEvent(newEvent);
+      }
+
+      handleCloseModal();
+    } catch (error) {
+      console.error('Failed to save event:', error);
     }
-    handleCloseModal();
+  };
+
+  const deleteEvent = async (eventId: string): Promise<void> => {
+    try {
+      await context.deleteEvent(eventId);
+      handleCloseModal();
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+      // Error is already logged in CalendarContext
+    }
+  };
+
+
+  const handleSubmitEvent = (formData: EventFormData): void => {
+    void submitEvent(formData);
   };
 
   const handleDeleteEvent = (eventId: string): void => {
-    deleteEvent(eventId);
-    handleCloseModal();
+    void deleteEvent(eventId);
   };
 
   return (
     <WeekViewContainer>
       <WeekHeader />
-      <TimeGrid onSlotClick={handleSlotClick} onEventClick={handleEventClick} />
+      <TimeGrid
+        onSlotClick={handleSlotClick}
+        onEventClick={handleEventClick}
+      />
       <EventModal
         isOpen={isModalOpen}
         selectedSlot={selectedSlot}
