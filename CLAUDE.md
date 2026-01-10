@@ -224,6 +224,15 @@ npm run test:e2e:ui   # Run E2E tests with Playwright UI
 npm run test:all      # Run all tests (unit + E2E)
 ```
 
+### Coverage Thresholds
+The project enforces minimum coverage thresholds. Push will fail if coverage drops below:
+- **Statements**: 30%
+- **Branches**: 25%
+- **Functions**: 35%
+- **Lines**: 30%
+
+Coverage reports are generated in `coverage/` directory (HTML report at `coverage/index.html`).
+
 ### Test File Location
 - Component tests: Place `ComponentName.test.tsx` in the same directory as the component
 - Utility tests: Place `utilName.test.ts` in the same directory as the utility
