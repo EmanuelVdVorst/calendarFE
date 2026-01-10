@@ -5,6 +5,7 @@ import { Table } from './Table';
 import type { ColumnDefinition } from './Table.type';
 
 interface TestData {
+  [key: string]: unknown;
   id: number;
   name: string;
   email: string;
