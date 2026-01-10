@@ -21,6 +21,7 @@ export function EventBlock({ event, top, height, column, onClick }: EventBlockPr
       $color={event.color}
       $borderColor={borderColor}
       onClick={handleClick}
+      data-testid="event-block"
     >
       <EventTitle>{event.title}</EventTitle>
       {height > 30 && <EventTime>{timeString}</EventTime>}

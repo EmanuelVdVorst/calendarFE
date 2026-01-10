@@ -7,5 +7,5 @@ export function TimeSlot({ date, hour, onClick }: TimeSlotProps): ReactElement {
     onClick(date, hour);
   };
 
-  return <StyledTimeSlot onClick={handleClick} />;
+  return <StyledTimeSlot onClick={handleClick} data-testid="time-slot" />;
 }

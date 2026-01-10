@@ -164,9 +164,9 @@ The project uses Husky to enforce code quality before commits and pushes:
 - Only lints files that are being committed (fast!)
 
 ### Pre-push Hook
-- Runs full TypeScript type checking (`tsc`)
-- Runs full production build (`vite build`)
-- Prevents pushing code that doesn't compile or has type errors
+- Runs all unit tests with coverage report (`npm run test:coverage`)
+- Runs full production build (`vite build`) which includes TypeScript type checking
+- Prevents pushing code that has failing tests or doesn't compile
 - This is the final quality gate before code reaches GitHub
 
 **Note:** If you need to bypass hooks in an emergency (not recommended), use `git commit --no-verify` or `git push --no-verify`.
@@ -206,3 +206,229 @@ src/components/
 
 ### Backend Integration
 The backend API runs on `http://localhost:5000` (see `../backend/CLAUDE.md`). When implementing API calls, ensure CORS is properly handled (already configured on backend).
+
+## Testing
+
+### Testing Framework
+- **Component Tests**: Vitest + React Testing Library
+- **E2E Tests**: Playwright
+
+### Running Tests
+```bash
+npm run test          # Run tests in watch mode
+npm run test:run      # Run tests once
+npm run test:coverage # Run tests with coverage report
+npm run test:ui       # Run tests with Vitest UI
+npm run test:e2e      # Run E2E tests (requires backend running)
+npm run test:e2e:ui   # Run E2E tests with Playwright UI
+npm run test:all      # Run all tests (unit + E2E)
+```
+
+### Test File Location
+- Component tests: Place `ComponentName.test.tsx` in the same directory as the component
+- Utility tests: Place `utilName.test.ts` in the same directory as the utility
+- E2E tests: Place in `e2e/` directory
+
+### Test Utilities
+Import test utilities from `src/test/test-utils`:
+```typescript
+import { render, renderWithoutProvider, screen } from '../../../test/test-utils';
+```
+
+- `render` - Renders with all providers (CalendarContext, etc.)
+- `renderWithoutProvider` - Renders without providers (for isolated component tests)
+
+---
+
+## Claude Commands
+
+### Creating a Basic Component
+
+When asked to create a new **basic/primitive component** (reusable UI component), create the following files in `src/components/basics/[ComponentName]/`:
+
+**1. `ComponentName.type.ts`** - Types first
+```typescript
+interface ComponentNameProps {
+  // Define all props with explicit types
+}
+
+export type { ComponentNameProps };
+```
+
+**2. `ComponentName.style.ts`** - Styled components
+```typescript
+import styled from 'styled-components';
+import { colors, fonts, spacing } from '../Styles';
+
+const StyledComponentName = styled.div({
+  // Use design tokens from Styles/constants.ts
+});
+
+export { StyledComponentName };
+```
+
+**3. `ComponentName.tsx`** - Component implementation
+```typescript
+import type { ReactElement } from 'react';
+import { StyledComponentName } from './ComponentName.style';
+import type { ComponentNameProps } from './ComponentName.type';
+
+function ComponentName({ prop1, prop2 }: ComponentNameProps): ReactElement {
+  return (
+    <StyledComponentName>
+      {/* Component content */}
+    </StyledComponentName>
+  );
+}
+
+export { ComponentName };
+```
+
+**4. `ComponentName.test.tsx`** - Tests
+```typescript
+import { describe, it, expect, vi } from 'vitest';
+import { screen } from '@testing-library/react';
+import { renderWithoutProvider } from '../../../test/test-utils';
+import { ComponentName } from './ComponentName';
+
+describe('ComponentName', () => {
+  const defaultProps = {
+    // Default test props
+  };
+
+  it('renders correctly', () => {
+    renderWithoutProvider(<ComponentName {...defaultProps} />);
+    // Assertions
+  });
+
+  it('handles user interactions', async () => {
+    const onClick = vi.fn();
+    const { user } = renderWithoutProvider(<ComponentName {...defaultProps} onClick={onClick} />);
+    await user.click(screen.getByRole('button'));
+    expect(onClick).toHaveBeenCalled();
+  });
+});
+```
+
+**5. `index.ts`** - Public exports
+```typescript
+export * from './ComponentName';
+export type { ComponentNameProps } from './ComponentName.type';
+```
+
+**6. Update `src/components/basics/index.ts`**
+```typescript
+export * from './ComponentName';
+```
+
+### Creating a Feature Component
+
+When asked to create a **feature component** (domain-specific), create files in `src/components/[FeatureName]/`:
+
+Follow the same structure as basic components but:
+- Import and compose basic components from `../basics`
+- Include feature-specific business logic
+- May include local state management
+- Tests should use `render` (with providers) if the component uses context
+
+```typescript
+// Feature component example
+import { Form, TextField, Modal } from '../basics';
+import { useCalendar } from '../../hooks/useCalendar';
+
+function FeatureComponent(): ReactElement {
+  const { events } = useCalendar();
+  // Feature-specific logic using basic components
+}
+```
+
+### Creating a Container
+
+When asked to create a **container** (smart component with state/context), create files in `src/containers/[ContainerName]/`:
+
+**Structure:**
+```
+src/containers/ContainerName/
+├── ContainerName.tsx      # Container with state/hooks
+├── ContainerName.style.ts # Layout styles only
+├── ContainerName.test.tsx # Tests with mocked context
+└── index.ts
+```
+
+**Container Pattern:**
+```typescript
+import { useState, type ReactElement } from 'react';
+import styled from 'styled-components';
+import { useCalendar } from '../../hooks/useCalendar';
+import { FeatureComponent } from '../../components/FeatureName';
+
+const ContainerWrapper = styled.div({
+  // Layout styles
+});
+
+function ContainerName(): ReactElement {
+  const context = useCalendar();
+  const [localState, setLocalState] = useState<StateType>(initialState);
+
+  const handleAction = (): void => {
+    // Orchestration logic
+  };
+
+  return (
+    <ContainerWrapper>
+      <FeatureComponent onAction={handleAction} data={context.data} />
+    </ContainerWrapper>
+  );
+}
+
+export { ContainerName };
+export default ContainerName;
+```
+
+### Creating a Page
+
+When asked to create a **page**, create files in `src/pages/[PageName]/`:
+
+```
+src/pages/PageName/
+├── PageName.tsx        # Page composition
+├── PageName.styles.ts  # Page layout styles
+└── index.ts
+```
+
+Pages compose containers and provide page-level layout.
+
+### Style Constants Reference
+
+When creating styles, import from `src/components/basics/Styles/constants.ts`:
+
+```typescript
+import {
+  colors,      // Primary, secondary, background colors
+  fonts,       // Font sizes and weights
+  spacing,     // Spacing values (xxxsmall to medium)
+  margins,     // Margin values
+  paddings,    // Padding values
+  borderRadius,// Border radius values
+  weekGrid,    // Calendar-specific grid settings
+  transitions, // Animation timings
+  shadows,     // Box shadow values
+  opacity,     // Opacity values
+} from '../Styles';
+```
+
+### Component Checklist
+
+Before completing a component, verify:
+- [ ] Types defined in `.type.ts`
+- [ ] Styles use design tokens from `Styles/constants.ts`
+- [ ] Component has explicit return type (`ReactElement` or `JSX.Element`)
+- [ ] Props use type-only imports (`import type { ... }`)
+- [ ] Tests cover: rendering, user interactions, edge cases
+- [ ] Exported from component's `index.ts`
+- [ ] Exported from parent's `index.ts` (basics/index.ts or feature index)
+- [ ] No inline styles
+- [ ] No `any` types
+- [ ] Functions under 100 lines
+- [ ] Run `npm run lint` passes
+- [ ] Run `npm run test:run` passes
